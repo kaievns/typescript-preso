@@ -1,0 +1,308 @@
+import { condensed as theme } from 'mdx-deck/themes'
+import okaidia from 'react-syntax-highlighter/styles/prism/okaidia'
+import prismTypescript from 'react-syntax-highlighter/languages/prism/typescript'
+theme.img = { minWidth: '500px', maxWidth: '1000px', maxHeight: '500px', objectFit: 'contain' };
+theme.prism = { style: okaidia, languages: { ts: prismTypescript } };
+export { theme };
+
+# TypeScript WIP
+---
+# Ohi, I'm Nikolay
+
+i'm here to help
+
+![](http://static.boxrec.com/thumb/f/f6/NicolayValuev.jpg/275px-NicolayValuev.jpg)
+---
+# TS First Attempt
+
+it's just like flow, right?
+
+![](https://slack-imgs.com/?c=1&url=https%3A%2F%2Fmedia1.giphy.com%2Fmedia%2FxT0xeC6tJVkladBBQI%2Fgiphy-downsized.gif%3Fcid%3D6104955e5bbaa2ca7449617036e9e97d)
+---
+# Everything is Typed
+
+![](https://i0.wp.com/www.tabletoptribe.com/wp-content/uploads/2017/03/One-of-Us.jpg?fit=625%2C468&ssl=1)
+
+---
+# Configuration
+
+![](https://wallpaper_finder.s3.amazonaws.com/wallpapers/thumbs_2/funny-pokemon-minimal-typography-keep-calm-and-carry-on.jpg)
+
+just don't
+
+---
+# Types vs. Interfaces
+
+* `interface` - is something you call
+* `type` - is something you get
+---
+
+# Interface
+
+```ts
+interface CallMeMaybe {
+  (number: string): any
+}
+
+const cally: CallMeMaybe = (number) => 
+  Math.random() * 5 | 0;
+```
+
+a function you can call
+
+---
+# Interface
+
+```ts
+interface Props {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+class UserProfile extends React.Component<Props> {
+  // ...
+}
+
+<UserProfile id="asdf" name="Baltazar" />
+```
+
+React prop types, are interface
+
+---
+# Interface
+
+```ts
+interface Destroyar {
+  destroy(): void
+}
+
+class StarDestroyar implements Destroyar {
+  destroy() {
+    return "pew pew pew!";
+  }
+}
+
+const destroyar = new StarDestroyar();
+destroyar.destroy(); // <- talking to the thing
+```
+
+A class can implement interface
+
+---
+# Type
+
+```ts
+const string = 'blah'; // <- type String
+const number = 123; // <- type String
+const list = [1, 2, 3]; // <- type number[]
+
+const user = new User(); // <- type User
+
+const UserClass = User; // <- typeof User
+```
+
+---
+# WTF is typeof?
+
+
+![](https://i.pinimg.com/236x/95/0f/d2/950fd2dc8ae6965ecd89f595c3a78edd--cubes-funny-animal-pictures.jpg)
+---
+# Not Type off
+
+![](https://i.ytimg.com/vi/iJJmnH9JxzU/maxresdefault.jpg)
+
+---
+# Typeof
+
+```ts
+class User {
+
+}
+
+const user = new User();
+
+user; // <- type User
+
+User; // <- type ???
+```
+
+---
+# The Problem
+
+```ts
+const decorator = (component: /* ???? */) {
+
+};
+
+// an constructor type
+const decorator = (component: typeof React.Component) {
+  
+}
+```
+---
+# Except...
+
+it doesn't work
+
+```ts
+type ReactComponent = typeof React.Component;
+// ^ this means React.Component exactly
+
+type AnySubclass = new(...args: any[]): ReactComponent;
+// ^ this means any subsclass of React.Component
+```
+---
+# Type Modifiers
+
+![](https://static.carthrottle.com/workspace/uploads/posts/2015/06/modificate-558006977ac59.jpg)
+
+---
+# Unions
+
+```ts
+type Shape = Rectangle | Circle;
+
+const area = (shape: Shape): number => {
+  if ((<Circle>shape).radius) {
+    return Math.PI * Math.power(shape.radius, 2);
+  } else if ((<Rectangle>shape).width) {
+    return shape.width * shape.height;
+  }
+}
+```
+
+---
+# Unions
+
+You can declare runtime typechecks
+
+```ts
+
+const isCircle = (s: Shape): s is Circle => 
+  (<Circle>shape).radius !== undefined;
+
+const isRectangle = (s: Shape): s is Rectangle =>
+  (<Rectangle>shape).width !== undefined;
+
+const area = (shape: Shape): number => {
+  if (isCircle(shape)) {
+    return Math.PI * Math.power(shape.radius, 2);
+  } else if (isRectangle(shape)) {
+    return shape.width * shape.height;
+  }
+}
+```
+
+---
+# Partials
+
+```ts
+class User {
+  id: string; // required!
+  email: string; // required!
+  username: string; // required!
+}
+
+const updateUser = (id: string, data: User) => { 
+  /*... */ 
+};
+
+updateUser(1, { email: 'hello@blahc.om' });
+// ^ this will explode
+```
+
+---
+# Partials
+
+```ts
+class User {
+  id: string; // required!
+  email: string; // required!
+  username: string; // required!
+}
+
+const updateUser = (id: string, data: Partial<User>) => { 
+  /*... */ 
+};
+
+updateUser(1, { email: 'hello@blahc.om' });
+```
+
+---
+# Readonly
+
+```ts
+const createUser = (id: string, data: Readonly<User>) => {
+  data.id = 'asdfadsf'; // will explode
+}
+```
+
+---
+# Generics
+
+like variables but for types
+
+![](https://media.makeameme.org/created/its-like-quotthe.jpg)
+
+---
+# Generics
+
+```ts
+type ListOf<T> = T[];
+
+const puppies: ListOf<Pup> = [new Pup(), new Pup()];
+const kitties: ListOf<Kty> = [new Kty(), new Kty()];
+
+kitties.push(new Pup()); // <- will explode
+```
+
+---
+# Generics
+
+```ts
+class Controller<T> {
+  find(id: string): T {}
+  create(data: T): T {}
+  update(data: Partial<T>): T
+}
+
+class users = new Controller<User>(User);
+
+users.find(123); // -> User
+users.create(new Pup()); // will explode
+```
+
+---
+# Custom Modifiers
+
+```ts
+type Partial<T> = {
+    [P in keyof T]?: T[P];
+}
+
+type Readonly<T> = {
+    readonly [P in keyof T]: T[P];
+}
+
+type Nullable<T> = {
+    [P in keyof T]: T[P] | null;
+}
+```
+
+---
+# Extending Generics
+
+```ts
+const decorator = <T extends React.Component>(component: T): T => {
+  // do stuff
+  return component;
+}
+
+decorator<Pup>(puppy); // will explode
+```
+
+---
+# The End
+
+![](https://images-na.ssl-images-amazon.com/images/I/712g27dgAmL._SX425_.jpg)
